@@ -1,0 +1,42 @@
+<body>
+	<p id="date"></p>
+	<p id="andy"></p>
+	<script type="text/javascript">
+		const today = new Date();
+		const date = document.getElementById('date')
+		const andy = document.getElementById('andy');
+	    const dayOfWeek = (Math.ceil((today - new Date(today.getFullYear(), 0, 1)) / 86400000) + 2) % 8;
+	    const untilFreeDay = 4 - dayOfWeek;
+	    const untilWorkDay = 8 - dayOfWeek;
+		if (untilWorkDay < 5) {
+			const next = new Date();
+			next.setDate(next.getDate() + untilWorkDay);
+			const format = new Intl.DateTimeFormat('es-AR', {weekday: 'long'});
+			andy.innerHTML = `${untilWorkDay} días hasta que se libere Andy 😔 (el ${format.format(next)})`
+			andy.className = "boo"
+		} else {
+			const next = new Date();
+			next.setDate(next.getDate() + untilFreeDay);
+			andy.innerHTML = `Hoy Andy está libre! 😄 (${untilFreeDay} días hasta que nos abandone 😔)`
+			andy.className = "yay"
+		}
+		const format = new Intl.DateTimeFormat('es-AR', {dateStyle: 'full'});
+	    date.innerHTML = `Hoy es ${format.format(today)}`;
+	</script>
+	<style type="text/css">
+		body {
+			height: 100%;
+			background-color: black;
+			color: white;
+			font-size: xxx-large;
+			font-family: Sans-Serif;
+			text-align: center;
+		}
+		.yay {
+			color: green;
+		}
+		.boo {
+			color: red;
+		}
+	</style>
+</body>
