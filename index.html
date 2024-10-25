@@ -33,10 +33,12 @@
 				const next = new Date();
 				next.setDate(next.getDate() + untilWorkDay);
 				const format = new Intl.DateTimeFormat('es-AR', { weekday: 'long' });
-				andy.innerHTML = `${until(untilWorkDay, 15)} días hasta que se libere Andy 😔 (el ${format.format(next)})`
+				andy.innerHTML = `${until(next, 15)} días hasta que se libere Andy 😔 (el ${format.format(next)})`
 				andy.className = "boo"
 			} else {
-				andy.innerHTML = `Hoy Andy está libre! 😄<br>(${until(untilFreeDay, 21)} hasta que nos abandone 😔)`
+				const next = new Date();
+				next.setDate(next.getDate() + untilFreeDay);
+				andy.innerHTML = `Hoy Andy está libre! 😄<br>(${until(next, 21)} hasta que nos abandone 😔)`
 				andy.className = "yay"
 			}
 			const format = new Intl.DateTimeFormat('es-AR', { dateStyle: 'full' });
