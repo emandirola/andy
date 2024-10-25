@@ -8,7 +8,7 @@
 	<script type="text/javascript">
 		function until(d, h) {
 			const then = new Date();
-			then.setDate(then.getDate() + d - 1);
+			then.setDate(then.getDate() + d);
 			then.setUTCHours(h);
 			then.setMinutes(0);
 			then.setSeconds(0);
@@ -33,12 +33,10 @@
 				const next = new Date();
 				next.setDate(next.getDate() + untilWorkDay);
 				const format = new Intl.DateTimeFormat('es-AR', { weekday: 'long' });
-				andy.innerHTML = `${until(next, 15)} días hasta que se libere Andy 😔 (el ${format.format(next)})`
+				andy.innerHTML = `${until(untilWorkDay, 15)} días hasta que se libere Andy 😔 (el ${format.format(next)})`
 				andy.className = "boo"
 			} else {
-				const next = new Date();
-				next.setDate(next.getDate() + untilFreeDay);
-				andy.innerHTML = `Hoy Andy está libre! 😄<br>(${until(next, 21)} hasta que nos abandone 😔)`
+				andy.innerHTML = `Hoy Andy está libre! 😄<br>(${until(untilFreeDay, 21)} hasta que nos abandone 😔)`
 				andy.className = "yay"
 			}
 			const format = new Intl.DateTimeFormat('es-AR', { dateStyle: 'full' });
