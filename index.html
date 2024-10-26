@@ -8,7 +8,7 @@
 	<script type="text/javascript">
 		function until(d, h) {
 			const then = new Date();
-			then.setDate(then.getDate() + d);
+			then.setDate(then.getDate() + d-1);
 			then.setUTCHours(h);
 			then.setMinutes(0);
 			then.setSeconds(0);
@@ -24,16 +24,17 @@
 		}
 		function update() {
 			const today = new Date();
+			today.setUTCHours(3);
 			const date = document.getElementById('date')
 			const andy = document.getElementById('andy');
-			const dayOfWeek = (Math.ceil((today - new Date(today.getFullYear(), 0, 1)) / 86400000) + 2) % 8;
+			const dayOfWeek = (Math.ceil((today - new Date(today.getFullYear(), 0, 1, 18)) / 86400000) + 2) % 8;
 			const untilFreeDay = 4 - dayOfWeek;
 			const untilWorkDay = 8 - dayOfWeek;
 			if (untilWorkDay < 5) {
 				const next = new Date();
 				next.setDate(next.getDate() + untilWorkDay);
 				const format = new Intl.DateTimeFormat('es-AR', { weekday: 'long' });
-				andy.innerHTML = `${until(untilWorkDay, 15)} días hasta que se libere Andy 😔 (el ${format.format(next)})`
+				andy.innerHTML = `${until(untilWorkDay, 21)} días hasta que se libere Andy 😔 (el ${format.format(next)})`
 				andy.className = "boo"
 			} else {
 				andy.innerHTML = `Hoy Andy está libre! 😄<br>(${until(untilFreeDay, 21)} hasta que nos abandone 😔)`
