@@ -1,56 +1,13 @@
-<head>
-	<title>Cuándo se libera Andy???</title>
-</head>
+<!DOCTYPE html>
 
-<body>
-	<p id="date"></p>
-	<p id="andy"></p>
-	<script type="text/javascript">
-		function until(d, h) {
-			const then = new Date();
-			then.setDate(then.getDate() + d-1);
-			then.setUTCHours(h);
-			then.setMinutes(0);
-			then.setSeconds(0);
-			const untilDate = (then - new Date()) / 1000;
-			const days = untilDate / 60 / 60 / 24 | 0;
-			const hours = untilDate / 60 / 60 % 24 | 0;
-			const minutes = untilDate / 60 % 60 | 0;
-			const seconds = untilDate % 60 | 0;
-			return [days, hours, minutes, seconds].map(print).join(':');
-		}
-		function print(n) {
-			return n < 10 ? '0' + n : n;
-		}
-		function update() {
-			const today = new Date();
-			today.setUTCHours(3);
-			const date = document.getElementById('date')
-			const andy = document.getElementById('andy');
-			const dayOfWeek = (Math.ceil((today - new Date(today.getFullYear(), 0, 1, 18)) / 86400000) + 2) % 8;
-			const untilFreeDay = 4 - dayOfWeek;
-			const untilWorkDay = 8 - dayOfWeek;
-			if (untilWorkDay < 5) {
-				const next = new Date();
-				next.setDate(next.getDate() + untilWorkDay);
-				const format = new Intl.DateTimeFormat('es-AR', { weekday: 'long' });
-				andy.innerHTML = `${until(untilWorkDay, 21)} días hasta que se libere Andy 😔 (el ${format.format(next)})`
-				andy.className = "boo"
-			} else {
-				andy.innerHTML = `Hoy Andy está libre! 😄<br>(${until(untilFreeDay, 21)} hasta que nos abandone 😔)`
-				andy.className = "yay"
-			}
-			const format = new Intl.DateTimeFormat('es-AR', { dateStyle: 'full' });
-			date.innerHTML = `Hoy es ${format.format(today)}`;
-		};
-		update();
-		window.setInterval(update, 1000);
-	</script>
-	<style type="text/css">
+<head lang="es-AR">
+	<title>Cuándo se libera Andy???</title>
+	<style>
 		body {
 			margin: 0;
 			padding: 1em;
-			height: 100%;
+			height: 100vh;
+			overflow: hidden;
 			background-color: black;
 			color: white;
 			font-size: xxx-large;
@@ -66,4 +23,58 @@
 			color: red;
 		}
 	</style>
+	<script>
+		const msInADay = 24 * 60 * 60 * 1000;
+		const shiftLength = 4 * msInADay;
+		const startDate = new Date(2024, 0, 2, 18, 0, 0);
+
+		function pad(value) {
+			return value.toString().padStart(2, '0');
+		}
+
+		function updateCountdown() {
+			const now = new Date();
+			const elapsed = now - startDate;
+			const cycleTime = elapsed % (shiftLength * 2);
+
+			let targetDate, statusMessage;
+			if (cycleTime < shiftLength) {
+				targetDate = new Date(now.getTime() + (shiftLength - cycleTime));
+				const days = Math.floor((targetDate - now) / msInADay);
+				const name = targetDate.toLocaleDateString('es-AR', {weekday: 'long'})
+				statusMessage = `${days} días hasta que se libere Andy 😔 (el ${name})`
+				className = 'boo';
+			} else {
+				targetDate = new Date(now.getTime() + (2 * shiftLength - cycleTime));
+				const days = Math.floor((targetDate - now) / msInADay);
+				const name = targetDate.toLocaleDateString('es-AR', {weekday: 'long'})
+				statusMessage = `Andy está libre! 😄<br>(${days} días hasta que nos abandone 😔, el ${name})`
+				className = 'yay';
+			}
+
+			const remainingTime = targetDate - now;
+			const days = Math.floor(remainingTime / msInADay);
+			const hours = Math.floor((remainingTime % msInADay) / (60 * 60 * 1000));
+			const minutes = Math.floor((remainingTime % (60 * 60 * 1000)) / (60 * 1000));
+			const seconds = Math.floor((remainingTime % (60 * 1000)) / 1000);
+
+			document.getElementById('date').innerHTML =
+				`Hoy es ${now.toLocaleDateString('es-AR')}`;
+			document.getElementById('message').className = className;
+			document.getElementById('status').innerHTML = statusMessage;
+			document.getElementById('counter').innerHTML =
+				`${pad(days)}:${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
+		}
+
+		window.onload = updateCountdown;
+		setInterval(updateCountdown, 1000);
+	</script>
+</head>
+
+<body>
+	<p id="date"></p>
+	<span id="message">
+		<p id="status"></p>
+		<p id="counter"></p>
+	</span>
 </body>
