@@ -59,7 +59,7 @@
 			const seconds = Math.floor((remainingTime % (60 * 1000)) / 1000);
 
 			document.getElementById('date').innerHTML =
-				`Hoy es ${now.toLocaleDateString('es-AR')}`;
+				`Hoy es ${now.toLocaleDateString('es-AR', {dateStyle: 'full'})}`;
 			document.getElementById('message').className = className;
 			document.getElementById('status').innerHTML = statusMessage;
 			document.getElementById('counter').innerHTML =
