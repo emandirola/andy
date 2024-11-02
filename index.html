@@ -1,7 +1,10 @@
 <!DOCTYPE html>
 
 <head lang="es-AR">
-	<title>Cuándo se libera Andy???</title>
+	<title>🎃 Cuándo se libera Andy???</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Rubik+Wet+Paint&display=swap" rel="stylesheet">
 	<style>
 		body {
 			margin: 0;
@@ -11,7 +14,7 @@
 			background-color: black;
 			color: white;
 			font-size: xxx-large;
-			font-family: monospace, sans-serif;
+			font-family: "Rubik Wet Paint", monospace, sans-serif;
 			text-align: center;
 		}
 
@@ -21,6 +24,79 @@
 
 		.boo {
 			color: red;
+		}
+		@keyframes jump-shaking {
+			0% { transform: translateX(0) }
+			25% { transform: translateY(-9px) }
+			35% { transform: translateY(-9px) rotate(calc(var(--rotate))) }
+			55% { transform: translateY(-9px) rotate(calc(-1 * var(--rotate))) }
+			65% { transform: translateY(-9px) rotate(calc(var(--rotate))) }
+			75% { transform: translateY(-9px) rotate(calc(-1 * var(--rotate))) }
+			100% { transform: translateY(0) rotate(0) }
+		}
+		@keyframes count {
+			0% { transform: translateZ(0) scale(1.05) }
+			50% { transform: translateZ(0) scale(1) }
+			100% { transform: translateZ(0) scale(1)}
+		}
+		#counter {
+			--rotate: 5deg;
+			display: inline-block;
+			transform: translateZ(0);
+		}
+		.shake {
+			animation: count 1s ease-out;
+		}
+		.content {
+			display: inline-grid;
+			grid-template-rows: .5fr 1fr .5fr;
+		}
+		.party {
+			display: grid;
+			grid-template-columns: 1fr 1fr;
+		}
+		@keyframes party {
+			0% { transform: rotateY(var(--rotate)) translateX(var(--translate)) }
+			100% { transform: rotateY(var(--rotate)) translateX(var(--translate)) scale(1.2) }
+		}
+		@keyframes sad {
+			0% { transform: initial }
+			25% { transform: scale(1.05) skew(var(--rotate)) }
+			50% { transform: initial }
+			75% { transform: scale(1.05) skew(calc(-1 * var(--rotate))); }
+			100% { transform: initial }
+		}
+		.yay + .party .icon {
+			--rotate: 0deg;
+			--translate: 0%;
+		}
+		.yay + .party .icon.right {
+			--rotate: 180deg;
+			--translate: -100%;
+		}
+		.boo + .party .icon {
+			--rotate: -10deg;
+		}
+		.boo + .party .icon.right {
+			--rotate: 10deg;
+		}
+		.icon::before {
+			display: inline-block;
+			transform-origin: 0 100%;
+		}
+		.yay + .party .icon::before {
+			animation: party alternate .25s ease-out infinite;
+		}
+		.boo + .party .icon::before {
+			animation: sad forwards 1s linear infinite;
+			transform-origin: 50% 100%;
+		}
+
+		.yay + .party .icon::before {
+			content: '🎉';
+		}
+		.boo + .party .icon::before {
+			content: '😭';
 		}
 	</style>
 	<script>
@@ -34,6 +110,7 @@
 
 		function updateCountdown() {
 			const now = new Date();
+			//now.setDate(now.getDate() - 1);
 			const elapsed = now - startDate;
 			const cycleTime = elapsed % (shiftLength * 2);
 
@@ -42,13 +119,13 @@
 				targetDate = new Date(now.getTime() + (shiftLength - cycleTime));
 				const days = Math.floor((targetDate - now) / msInADay);
 				const name = targetDate.toLocaleDateString('es-AR', {weekday: 'long'})
-				statusMessage = `${days} días hasta que se libere Andy 😔 (el ${name})`
+				statusMessage = `Andy no está! ⛏️<br>${days} días hasta que se libere Andy😔(el ${name})`
 				className = 'boo';
 			} else {
 				targetDate = new Date(now.getTime() + (2 * shiftLength - cycleTime));
 				const days = Math.floor((targetDate - now) / msInADay);
 				const name = targetDate.toLocaleDateString('es-AR', {weekday: 'long'})
-				statusMessage = `Andy está libre! 😄<br>(${days} días hasta que nos abandone 😔, el ${name})`
+				statusMessage = `Andy está libre! 😄<br>${days} días hasta que nos abandone 😔, el ${name}`
 				className = 'yay';
 			}
 
@@ -59,11 +136,14 @@
 			const seconds = Math.floor((remainingTime % (60 * 1000)) / 1000);
 
 			document.getElementById('date').innerHTML =
-				`Hoy es ${now.toLocaleDateString('es-AR', {dateStyle: 'full'})}`;
+				`🎃Hoy es ${now.toLocaleDateString('es-AR', {dateStyle: 'full'})}🎃`;
 			document.getElementById('message').className = className;
 			document.getElementById('status').innerHTML = statusMessage;
-			document.getElementById('counter').innerHTML =
+			const counter = document.getElementById('counter');
+			counter.innerHTML =
 				`${pad(days)}:${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
+			counter.classList.remove('shake');
+			setTimeout(() => counter.classList.add('shake'), 0);
 		}
 
 		window.onload = updateCountdown;
@@ -72,9 +152,16 @@
 </head>
 
 <body>
-	<p id="date"></p>
-	<span id="message">
-		<p id="status"></p>
-		<p id="counter"></p>
-	</span>
+	<div class="content">
+		<p id="date"></p>
+		<span id="message">
+			<span id="status"></span>
+			<br />
+			<span id="counter"></span>
+		</span>
+		<span class="party">
+			<span class="icon"></span>
+			<span class="icon right"></span>
+		</span>
+	</div>
 </body>
