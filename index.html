@@ -4,7 +4,7 @@
 	<title>🎃 Cuándo se libera Andy???</title>
 	<link rel="preconnect" href="https://fonts.googleapis.com">
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-	<link href="https://fonts.googleapis.com/css2?family=Rubik+Wet+Paint&display=swap" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css2?family=Noto+Color+Emoji&family=Rubik+Wet+Paint&display=swap" rel="stylesheet">
 	<style>
 		body {
 			margin: 0;
@@ -14,7 +14,7 @@
 			background-color: black;
 			color: white;
 			font-size: xxx-large;
-			font-family: "Rubik Wet Paint", monospace, sans-serif;
+			font-family: "Rubik Wet Paint", "Noto Color Emoji", monospace, sans-serif;
 			text-align: center;
 		}
 
@@ -165,7 +165,7 @@
 				remainingSeconds = Math.floor((targetDate - now) / 1000);
 				const days = Math.floor((targetDate - now) / msInADay);
 				const name = targetDate.toLocaleDateString('es-AR', { weekday: 'long' })
-				statusMessage = `Andy no está! ⛏️<br>Se libera el ${name} 🤩`
+				statusMessage = `Andy no está! 🪏<br>Se libera el ${name} 🤩`
 				className = 'boo';
 			} else {
 				targetDate = new Date(now.getTime() + (2 * shiftLength - cycleTime));
