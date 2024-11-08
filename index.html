@@ -162,7 +162,8 @@
 		function sigmoid(seconds) {
 			const normalized = 1 - seconds / (4 * 24 * 60 * 60);
 			const sigmoid = Math.tanh(normalized);
-			const scaled = sigmoid / 2 + 1.5;
+			const scaled = sigmoid + 1;
+			console.log(seconds, normalized, sigmoid, scaled)
 			return scaled;
 		}
 
