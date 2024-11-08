@@ -32,7 +32,7 @@
 
 		@keyframes clock {
 			0% {
-				transform: scale(var(--normalized));
+				transform: scale(var(--scale));
 			}
 
 			100% {
@@ -41,14 +41,6 @@
 		}
 
 		#counter {
-			--seconds: 0;
-			--max-input: 345600;
-			--output-max: 2;
-			--steepness: 1;
-			--midpoint: 0.5;
-			--normalized-seconds: calc((var(--seconds)) / var(--max-input) * pi);
-			--cos: calc(cos(var(--normalized-seconds)) / 2);
-			--normalized: calc(var(--cos) * (var(--output-max) - 1) + 1.5);
 			display: inline-block;
 			z-index: 1;
 		}
@@ -147,15 +139,36 @@
 		const msInADay = 24 * 60 * 60 * 1000;
 		const shiftLength = 4 * msInADay;
 		const startDate = new Date(2024, 0, 2, 18, 0, 0);
+		let millis = false;
+		let extraDays = 0;
+		addEventListener('keydown', ev => {
+			switch (ev.key) {
+				case ' ':
+					millis = !millis;
+					break;
+				case '+':
+					extraDays++;
+					break;
+				case '-':
+					extraDays--;
+					break;
+			}
+		})
 
 		function pad(value) {
 			return value.toString().padStart(2, '0');
 		}
 
-		let animation;
+		function sigmoid(seconds) {
+			const normalized = 1 - seconds / (4 * 24 * 60 * 60);
+			const sigmoid = Math.tanh(normalized);
+			const scaled = sigmoid / 2 + 1.5;
+			return scaled;
+		}
+
 		function updateCountdown() {
 			const now = new Date();
-			now.setDate(now.getDate() - 0);
+			now.setDate(now.getDate() + extraDays);
 			const elapsed = now - startDate;
 			const cycleTime = elapsed % (shiftLength * 2);
 
@@ -181,15 +194,16 @@
 			const hours = Math.floor((remainingTime % msInADay) / (60 * 60 * 1000));
 			const minutes = Math.floor((remainingTime % (60 * 60 * 1000)) / (60 * 1000));
 			const seconds = Math.floor((remainingTime % (60 * 1000)) / 1000);
+			const milliseconds = millis ? `.${remainingTime % 1000}` : '';
 
 			document.getElementById('date').innerHTML =
 				`🎃Hoy es ${now.toLocaleDateString('es-AR', { dateStyle: 'full' })}🎃`;
 			document.getElementById('message').className = className;
 			document.getElementById('status').innerHTML = statusMessage;
 			const counter = document.getElementById('counter');
-			counter.innerHTML = `${pad(days)}:${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
+			counter.innerHTML = `${pad(days)}:${pad(hours)}:${pad(minutes)}:${pad(seconds)}${milliseconds}`;
 
-			counter.style.setProperty('--seconds', remainingSeconds);
+			counter.style.setProperty('--scale', sigmoid(remainingSeconds));
 
 			requestAnimationFrame(updateCountdown);
 		}
@@ -206,6 +220,7 @@
 </head>
 
 <body>
+	<script>0</script>
 	<div class="content">
 		<p id="date"></p>
 		<span id="message">
