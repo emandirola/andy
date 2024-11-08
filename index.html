@@ -25,58 +25,121 @@
 		.boo {
 			color: red;
 		}
-		#counter {
-			display: inline-block;
+
+		#message {
+			z-index: 2;
 		}
+
+		@keyframes clock {
+			0% {
+				transform: scale(var(--normalized));
+			}
+
+			100% {
+				transform: scale(1);
+			}
+		}
+
+		#counter {
+			--seconds: 0;
+			--max-input: 345600;
+			--output-max: 2;
+			--steepness: 1;
+			--midpoint: 0.5;
+			--normalized-seconds: calc((var(--seconds)) / var(--max-input) * pi);
+			--cos: calc(cos(var(--normalized-seconds)) / 2);
+			--normalized: calc(var(--cos) * (var(--output-max) - 1) + 1.5);
+			display: inline-block;
+			z-index: 1;
+		}
+
+		#counter.start {
+			animation: clock 1s infinite ease-out;
+		}
+
 		.content {
 			display: inline-grid;
 			grid-template-rows: .5fr 1fr .5fr;
 		}
+
 		.party {
 			display: grid;
 			grid-template-columns: 1fr 1fr;
 		}
+
 		@keyframes party {
-			0% { transform: rotateY(var(--rotate)) translateX(var(--translate)) }
-			100% { transform: rotateY(var(--rotate)) translateX(var(--translate)) scale(1.2) }
+			0% {
+				transform: rotateY(var(--rotate)) translateX(var(--translate))
+			}
+
+			100% {
+				transform: rotateY(var(--rotate)) translateX(var(--translate)) scale(1.2)
+			}
 		}
+
 		@keyframes sad {
-			0% { transform: initial }
-			25% { transform: scale(1.05) skew(var(--rotate)) }
-			50% { transform: initial }
-			75% { transform: scale(1.05) skew(calc(-1 * var(--rotate))); }
-			100% { transform: initial }
+			0% {
+				transform: initial
+			}
+
+			25% {
+				transform: scale(1.05) skew(var(--rotate))
+			}
+
+			50% {
+				transform: initial
+			}
+
+			75% {
+				transform: scale(1.05) skew(calc(-1 * var(--rotate)));
+			}
+
+			100% {
+				transform: initial
+			}
 		}
-		.yay + .party .icon {
+
+		.yay+.party .icon {
 			--rotate: 0deg;
 			--translate: 0%;
 		}
-		.yay + .party .icon.right {
+
+		.yay+.party .icon.right {
 			--rotate: 180deg;
 			--translate: -100%;
 		}
-		.boo + .party .icon {
+
+		.boo+.party .icon {
 			--rotate: -10deg;
 		}
-		.boo + .party .icon.right {
+
+		.boo+.party .icon.right {
 			--rotate: 10deg;
 		}
+
+		.party {
+			z-index: 0
+		}
+
 		.icon::before {
 			display: inline-block;
 			transform-origin: 0 100%;
 		}
-		.yay + .party .icon::before {
+
+		.yay+.party .icon::before {
 			animation: party alternate .25s ease-out infinite;
 		}
-		.boo + .party .icon::before {
+
+		.boo+.party .icon::before {
 			animation: sad forwards 1s linear infinite;
 			transform-origin: 50% 100%;
 		}
 
-		.yay + .party .icon::before {
+		.yay+.party .icon::before {
 			content: '🎉';
 		}
-		.boo + .party .icon::before {
+
+		.boo+.party .icon::before {
 			content: '😭';
 		}
 	</style>
@@ -92,22 +155,24 @@
 		let animation;
 		function updateCountdown() {
 			const now = new Date();
-			//now.setDate(now.getDate() - 1);
+			now.setDate(now.getDate() - 0);
 			const elapsed = now - startDate;
 			const cycleTime = elapsed % (shiftLength * 2);
 
-			let targetDate, statusMessage;
+			let targetDate, statusMessage, remainingSeconds;
 			if (cycleTime < shiftLength) {
 				targetDate = new Date(now.getTime() + (shiftLength - cycleTime));
+				remainingSeconds = Math.floor((targetDate - now) / 1000);
 				const days = Math.floor((targetDate - now) / msInADay);
-				const name = targetDate.toLocaleDateString('es-AR', {weekday: 'long'})
-				statusMessage = `Andy no está! ⛏️<br>${days} días hasta que se libere Andy😔(el ${name})`
+				const name = targetDate.toLocaleDateString('es-AR', { weekday: 'long' })
+				statusMessage = `Andy no está! ⛏️<br>Se libera el ${name} 🤩`
 				className = 'boo';
 			} else {
 				targetDate = new Date(now.getTime() + (2 * shiftLength - cycleTime));
+				remainingSeconds = Math.floor((targetDate - now) / 1000);
 				const days = Math.floor((targetDate - now) / msInADay);
-				const name = targetDate.toLocaleDateString('es-AR', {weekday: 'long'})
-				statusMessage = `Andy está libre! 😄<br>${days} días hasta que nos abandone 😔, el ${name}`
+				const name = targetDate.toLocaleDateString('es-AR', { weekday: 'long' })
+				statusMessage = `Andy está libre! 😄<br>Nos abandona el ${name} 😔`
 				className = 'yay';
 			}
 
@@ -118,21 +183,25 @@
 			const seconds = Math.floor((remainingTime % (60 * 1000)) / 1000);
 
 			document.getElementById('date').innerHTML =
-				`🎃Hoy es ${now.toLocaleDateString('es-AR', {dateStyle: 'full'})}🎃`;
+				`🎃Hoy es ${now.toLocaleDateString('es-AR', { dateStyle: 'full' })}🎃`;
 			document.getElementById('message').className = className;
 			document.getElementById('status').innerHTML = statusMessage;
 			const counter = document.getElementById('counter');
-			counter.innerHTML =
-				`${pad(days)}:${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
-			animation?.cancel()
-			animation = counter.animate([
-				{ transform: 'translateZ(0) scale(1.05)' },
-				{ transform: 'translateZ(0) scale(1)' }
-			], { duration: 1000, iterations: 1 });
-		}
+			counter.innerHTML = `${pad(days)}:${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
 
-		window.onload = updateCountdown;
-		setInterval(updateCountdown, 1000);
+			counter.style.setProperty('--seconds', remainingSeconds);
+
+			requestAnimationFrame(updateCountdown);
+		}
+		requestAnimationFrame(updateCountdown);
+
+		const now = new Date();
+		const delay = 1000 - now.getMilliseconds();
+		setTimeout(() => {
+			const counter = document.getElementById('counter');
+			counter.classList.add('start');
+		}, delay);
+
 	</script>
 </head>
 
