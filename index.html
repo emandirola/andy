@@ -179,7 +179,7 @@
 				case 1:  return { emoji: '🥂', fontFamily: 'Tiny5' };
 				case 10: return { emoji: '🎃', fontFamily: 'Rubik Wet Paint' };
 				case 11: return { emoji: day === 18 ? '🎂' : '🎁', fontFamily: 'Atkinson Hyperlegible', extraText: day === 18 ? 'Hoy es el cumple!🎂' : '' };
-				case 12: return { emoji: '🎄', fontFamily: 'Mountains of Christmas' };
+				case 12: return { emoji: '🎄', fontFamily: 'Mountains of Christmas', extraText: day === 24 ? 'Navidad!🎄' : day === 31 ? 'Año nuevo!' : '🥂'};
 				default: return { emoji: '  ', fontFamily: 'Tiny5'};
 			}
 		}
