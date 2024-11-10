@@ -1,12 +1,13 @@
 <!DOCTYPE html>
 
 <head lang="es-AR">
-	<title>🎃 Cuándo se libera Andy???</title>
+	<title data-title="Cuándo se libera Andy???">Cuándo se libera Andy???</title>
 	<link rel="preconnect" href="https://fonts.googleapis.com">
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-	<link href="https://fonts.googleapis.com/css2?family=Noto+Color+Emoji&family=Rubik+Wet+Paint&display=swap" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&family=Mountains+of+Christmas:wght@400;700&family=Noto+Color+Emoji&family=Rubik+Wet+Paint&family=Tiny5&display=swap" rel="stylesheet">
 	<style>
 		body {
+			--font-family: 'Tiny5';
 			margin: 0;
 			padding: 1em;
 			height: 100vh;
@@ -14,7 +15,8 @@
 			background-color: black;
 			color: white;
 			font-size: xxx-large;
-			font-family: "Rubik Wet Paint", "Noto Color Emoji", monospace, sans-serif;
+			font-display: swap;
+			font-family: var(--font-family), "Noto Color Emoji", monospace, sans-serif;
 			text-align: center;
 		}
 
@@ -167,6 +169,21 @@
 			return scaled;
 		}
 
+		/**
+		 * @param date {Date}
+		 */
+		function dateCustomization(date) {
+			const month = date.getMonth() + 1;
+			const day = date.getDate();
+			switch (month) {
+				case 1:  return { emoji: '🥂', fontFamily: 'Tiny5' };
+				case 10: return { emoji: '🎃', fontFamily: 'Rubik Wet Paint' };
+				case 11: return { emoji: day === 18 ? '🎂' : '🎁', fontFamily: 'Atkinson Hyperlegible', extraText: day === 18 ? 'Hoy es el cumple!🎂' : '' };
+				case 12: return { emoji: '🎄', fontFamily: 'Mountains of Christmas' };
+				default: return { emoji: '  ', fontFamily: 'Tiny5'};
+			}
+		}
+
 		function updateCountdown() {
 			const now = new Date();
 			now.setDate(now.getDate() + extraDays);
@@ -195,10 +212,18 @@
 			const hours = Math.floor((remainingTime % msInADay) / (60 * 60 * 1000));
 			const minutes = Math.floor((remainingTime % (60 * 60 * 1000)) / (60 * 1000));
 			const seconds = Math.floor((remainingTime % (60 * 1000)) / 1000);
-			const milliseconds = millis ? `.${remainingTime % 1000}` : '';
+			const milliseconds = millis ? `.${(remainingTime % 1000).toString().padStart(3, '0')}` : '';
+			
+			const {emoji, fontFamily, extraText} = dateCustomization(now);
 
+			if (extraText) {
+				statusMessage += `<br>${extraText}`;
+			}
+
+			document.body.style.setProperty('--font-family', fontFamily);
+			document.title = `${emoji} ${document.getElementsByTagName('title')[0].dataset.title} ${emoji}`.trim();
 			document.getElementById('date').innerHTML =
-				`🎃Hoy es ${now.toLocaleDateString('es-AR', { dateStyle: 'full' })}🎃`;
+				`${emoji} Hoy es ${now.toLocaleDateString('es-AR', { dateStyle: 'full' })} ${emoji}`.trim();
 			document.getElementById('message').className = className;
 			document.getElementById('status').innerHTML = statusMessage;
 			const counter = document.getElementById('counter');
