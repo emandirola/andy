@@ -4,7 +4,9 @@
 	<title data-title="Cuándo se libera Andy???">Cuándo se libera Andy???</title>
 	<link rel="preconnect" href="https://fonts.googleapis.com">
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-	<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&family=Mountains+of+Christmas:wght@400;700&family=Noto+Color+Emoji&family=Rubik+Wet+Paint&family=Tiny5&display=swap" rel="stylesheet">
+	<link
+		href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&family=Mountains+of+Christmas:wght@400;700&family=Noto+Color+Emoji&family=Rubik+Wet+Paint&family=Tiny5&display=swap"
+		rel="stylesheet">
 	<style>
 		body {
 			--font-family: 'Tiny5';
@@ -34,11 +36,7 @@
 
 		@keyframes clock {
 			0% {
-				transform: scale(var(--scale));
-			}
-
-			100% {
-				transform: scale(1);
+				scale: var(--scale);
 			}
 		}
 
@@ -56,85 +54,60 @@
 			grid-template-rows: .5fr 1fr .5fr;
 		}
 
+		@keyframes sad-scale {
+			from {
+				scale: 1.05
+			}
+		}
+
+		@keyframes sad-skew {
+			from {
+				transform: skew(10deg);
+			}
+
+			to {
+				transform: skew(-10deg);
+			}
+		}
+
+		.icon.right {
+			scale: -1 1
+		}
+
 		.party {
 			display: grid;
-			grid-template-columns: 1fr 1fr;
+			grid-template-columns: 1fr auto 1fr;
+			z-index: 0
+		}
+		@media (max-aspect-ratio: 1) {
+			.party {
+				grid-template-columns: auto 1fr auto;
+			}
 		}
 
 		@keyframes party {
-			0% {
-				transform: rotateY(var(--rotate)) translateX(var(--translate))
+			from {
+				scale: 1.2
 			}
-
-			100% {
-				transform: rotateY(var(--rotate)) translateX(var(--translate)) scale(1.2)
-			}
-		}
-
-		@keyframes sad {
-			0% {
-				transform: initial
-			}
-
-			25% {
-				transform: scale(1.05) skew(var(--rotate))
-			}
-
-			50% {
-				transform: initial
-			}
-
-			75% {
-				transform: scale(1.05) skew(calc(-1 * var(--rotate)));
-			}
-
-			100% {
-				transform: initial
-			}
-		}
-
-		.yay+.party .icon {
-			--rotate: 0deg;
-			--translate: 0%;
-		}
-
-		.yay+.party .icon.right {
-			--rotate: 180deg;
-			--translate: -100%;
-		}
-
-		.boo+.party .icon {
-			--rotate: -10deg;
-		}
-
-		.boo+.party .icon.right {
-			--rotate: 10deg;
-		}
-
-		.party {
-			z-index: 0
 		}
 
 		.icon::before {
 			display: inline-block;
 			transform-origin: 0 100%;
-		}
-
-		.yay+.party .icon::before {
-			animation: party alternate .25s ease-out infinite;
-		}
-
-		.boo+.party .icon::before {
-			animation: sad forwards 1s linear infinite;
-			transform-origin: 50% 100%;
+			margin: 0 1em;
 		}
 
 		.yay+.party .icon::before {
 			content: '🎉';
+			animation: party alternate .25s ease-out infinite;
 		}
 
 		.boo+.party .icon::before {
 			content: '😭';
+			animation: alternate linear infinite;
+			animation-name: sad-skew, sad-scale;
+			animation-duration: .5s, .25s;
+			transform-origin: 50% 100%;
 		}
 	</style>
 	<script>
@@ -171,41 +144,50 @@
 
 		/**
 		 * @param date {Date}
+		 * @returns {{emoji: string, fontFamily: string, extraText?: string}}
 		 */
 		function dateCustomization(date) {
 			const month = date.getMonth() + 1;
 			const day = date.getDate();
 			switch (month) {
-				case 1:  return { emoji: '🥂', fontFamily: 'Tiny5' };
+				case 1: return { emoji: '🥂', fontFamily: 'Tiny5' };
 				case 10: return { emoji: '🎃', fontFamily: 'Rubik Wet Paint' };
-				case 11: return { emoji: day === 18 ? '🎂' : '🎁', fontFamily: 'Atkinson Hyperlegible', extraText: day === 18 ? 'Hoy es el cumple!🎂' : '' };
-				case 12: return { emoji: '🎄', fontFamily: 'Mountains of Christmas', extraText: day === 24 ? 'Navidad!🎄' : day === 31 ? 'Año nuevo!' : '🥂'};
-				default: return { emoji: '  ', fontFamily: 'Tiny5'};
+				case 11: return { emoji: day === 18 ? '🎂' : '🎁', fontFamily: 'Atkinson Hyperlegible', extraText: day === 18 ? 'Feliz cumple!🎂' : '' };
+				case 12: return { emoji: '🎄', fontFamily: 'Mountains of Christmas', extraText: day === 24 ? 'Navidad!🎄' : day === 31 ? 'Año nuevo!' : '🥂' };
+				default: return { emoji: '  ', fontFamily: 'Tiny5' };
 			}
+		}
+
+		/**
+		 * @param date {Date}
+		 */
+		function getTodaysStatus(date) {
+			const elapsed = date - startDate;
+			const cycleTime = elapsed % (shiftLength * 2);
+			let targetDate, statusMessage, remainingSeconds;
+			if (cycleTime < shiftLength) {
+				targetDate = new Date(date.getTime() + (shiftLength - cycleTime));
+				remainingSeconds = Math.floor((targetDate - date) / 1000);
+				const days = Math.floor((targetDate - date) / msInADay);
+				const name = targetDate.toLocaleDateString('es-AR', { weekday: 'long' })
+				statusMessage = `Andy no está! 🪏<br>Se libera el ${name} 🤩`
+				className = 'boo';
+			} else {
+				targetDate = new Date(date.getTime() + (2 * shiftLength - cycleTime));
+				remainingSeconds = Math.floor((targetDate - date) / 1000);
+				const days = Math.floor((targetDate - date) / msInADay);
+				const name = targetDate.toLocaleDateString('es-AR', { weekday: 'long' })
+				statusMessage = `Andy está libre! 😄<br>Nos abandona el ${name} 😔`
+				className = 'yay';
+			}
+			return { targetDate, statusMessage, remainingSeconds };
 		}
 
 		function updateCountdown() {
 			const now = new Date();
 			now.setDate(now.getDate() + extraDays);
-			const elapsed = now - startDate;
-			const cycleTime = elapsed % (shiftLength * 2);
 
-			let targetDate, statusMessage, remainingSeconds;
-			if (cycleTime < shiftLength) {
-				targetDate = new Date(now.getTime() + (shiftLength - cycleTime));
-				remainingSeconds = Math.floor((targetDate - now) / 1000);
-				const days = Math.floor((targetDate - now) / msInADay);
-				const name = targetDate.toLocaleDateString('es-AR', { weekday: 'long' })
-				statusMessage = `Andy no está! 🪏<br>Se libera el ${name} 🤩`
-				className = 'boo';
-			} else {
-				targetDate = new Date(now.getTime() + (2 * shiftLength - cycleTime));
-				remainingSeconds = Math.floor((targetDate - now) / 1000);
-				const days = Math.floor((targetDate - now) / msInADay);
-				const name = targetDate.toLocaleDateString('es-AR', { weekday: 'long' })
-				statusMessage = `Andy está libre! 😄<br>Nos abandona el ${name} 😔`
-				className = 'yay';
-			}
+			const { targetDate, statusMessage, remainingSeconds } = getTodaysStatus(now);
 
 			const remainingTime = targetDate - now;
 			const days = Math.floor(remainingTime / msInADay);
@@ -213,19 +195,19 @@
 			const minutes = Math.floor((remainingTime % (60 * 60 * 1000)) / (60 * 1000));
 			const seconds = Math.floor((remainingTime % (60 * 1000)) / 1000);
 			const milliseconds = millis ? `.${(remainingTime % 1000).toString().padStart(3, '0')}` : '';
-			
-			const {emoji, fontFamily, extraText} = dateCustomization(now);
 
-			if (extraText) {
-				statusMessage += `<br>${extraText}`;
-			}
+			const { emoji, fontFamily, extraText } = dateCustomization(now);
+
+			const status = extraText ? `${statusMessage}<br>${extraText}` : statusMessage;
 
 			document.body.style.setProperty('--font-family', fontFamily);
 			document.title = `${emoji} ${document.getElementsByTagName('title')[0].dataset.title} ${emoji}`.trim();
-			document.getElementById('date').innerHTML =
-				`${emoji} Hoy es ${now.toLocaleDateString('es-AR', { dateStyle: 'full' })} ${emoji}`.trim();
+			const dateElem = document.getElementById('date');
+			dateElem.innerHTML =
+				`Hoy es ${now.toLocaleDateString('es-AR', { dateStyle: 'full' })}`;
+			dateElem.style.setProperty('--emoji', `'${emoji}'`);
 			document.getElementById('message').className = className;
-			document.getElementById('status').innerHTML = statusMessage;
+			document.getElementById('status').innerHTML = status;
 			const counter = document.getElementById('counter');
 			counter.innerHTML = `${pad(days)}:${pad(hours)}:${pad(minutes)}:${pad(seconds)}${milliseconds}`;
 
@@ -233,7 +215,6 @@
 
 			requestAnimationFrame(updateCountdown);
 		}
-		requestAnimationFrame(updateCountdown);
 
 		const now = new Date();
 		const delay = 1000 - now.getMilliseconds();
@@ -245,10 +226,23 @@
 	</script>
 </head>
 
-<body>
-	<script>0</script>
+<body onload="updateCountdown()">
 	<div class="content">
-		<p id="date"></p>
+		<style>
+			.content > span {
+				margin: .5em 0;
+			}
+				#date { 
+					display: flex;
+					align-items: center;
+				}
+				#date::after, #date::before {
+					content: var(--emoji);
+					margin: 0 .5em;
+					display: block;
+				}
+		</style>
+		<span id="date"></span>
 		<span id="message">
 			<span id="status"></span>
 			<br />
@@ -256,6 +250,7 @@
 		</span>
 		<span class="party">
 			<span class="icon"></span>
+			<span></span>
 			<span class="icon right"></span>
 		</span>
 	</div>
